@@ -1,10 +1,11 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes.auth import router
+from routes.auth import router as authRouter
 from dotenv import load_dotenv
-from routes.auth import require_auth
+
 from routes.api import router as apiRoutes
+
 
 load_dotenv()
 
@@ -22,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-app.include_router(router)
+app.include_router(authRouter)
 app.include_router(apiRoutes)
 
 
