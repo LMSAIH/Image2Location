@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, HTTPBearer
 from typing import Optional
 from models.auth import UserCreate, UserLogin, Token, UserResponse
 from database.db import supabase, supabase_admin
@@ -8,7 +8,7 @@ import re
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-@router.post("/register", response_model=UserResponse)
+@router.post("/signup", response_model=UserResponse)
 async def register(user: UserCreate):
     try:
         
@@ -63,8 +63,7 @@ async def login(response: Response, user: UserLogin):
         )
        
         return Token(
-            access_token=access_token, 
-            token_type="bearer"
+            access_token=f"Bearer {access_token}", 
         )
         
     except Exception as e:
@@ -74,47 +73,16 @@ async def login(response: Response, user: UserLogin):
             detail=detail
         )
         
-        
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+@router.get('/logout')
+async def logout(response: Response):
     try:
-        user = supabase.auth.get_user(token)
-        return UserResponse(id = user.id, email = user.email)
-    except Exception:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-
-async def require_auth(request: Request):
-    """
-    Dependency function to check if user is authenticated
-    Returns the user token if authenticated, raises 401 if not
-    """
-    token = request.cookies.get("access_token")
-    if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated. Please log in first.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-        
-    try:
-        
-        user_res = supabase.auth.get_user(token)
-        
-        if not user_res or not user_res.user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authentication credentials",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-            
-        return token
-        
+        response.delete_cookie(key="access_token")
+        return {"message": "success", "response": response}
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=getattr(e, "detail", str(e)),
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=str(e)
         )
-        
-   
 
 def is_strong_password(password: str) -> bool:
     """
