@@ -1,4 +1,5 @@
 from pydantic import BaseModel 
+from typing import List 
 
 class Image(BaseModel):
     imageUrl: str
@@ -12,4 +13,7 @@ class Location(BaseModel):
     province: str
     imageUrl: str
     user: str
+
+class Locations(BaseModel):
+    locations: List[Location]
     
