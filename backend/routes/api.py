@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, File, UploadFile
-from models.location import Image, Location 
+from models.location import Image, Location, Locations
 from database.db import supabase, supabase_admin, supabase_bucket, supabase_url
 from middleware.auth import get_current_user
 import uuid
@@ -14,7 +14,7 @@ picarta_key = os.getenv("PICARTA_API_KEY")
 localizer = Picarta(picarta_key)
 
 
-@router.post('/addImage', response_model=Image )
+@router.post('/addImage', response_model=Location )
 async def addImage(
     request: Request,
     user = Depends(get_current_user),
@@ -59,11 +59,38 @@ async def addImage(
              
             supabase.table("Locations").insert(location).execute()
             
-            return Image(imageUrl=imageUrl, user=user.id)
-        
+            return Location(latitude=location["latitude"], longitude=location["longitude"], country=location["country"],
+                            province=location["province"], city=location["city"], imageUrl=location["image_url"],
+                            user = location["user"])
+            
     except Exception as e:
-         raise HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail=str(e)
         )
+                            
     
+@router.get('/locations', response_model=Locations)
+async def getLocations(request: Request, user = Depends(get_current_user)):
+
+    try:
+        
+        user_locations = supabase.table("Locations").select().eq("user",user.id).execute()
+        locations = []
+        
+        for location in user_locations.data:
+            locations.append(Location(latitude=location["latitude"], longitude=location["longitude"], country=location["country"],
+                                      province=location["province"], city = location['city'], imageUrl=location["image_url"],
+                                      user=location['user']))
+        
+        return Locations(locations=locations)
+    
+    except Exception as e:
+        
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=str(e)
+        )
+        
+        
+        
