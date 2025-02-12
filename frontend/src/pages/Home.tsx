@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-// import './Home.css' // Uncomment if you have a CSS file for this component
 
 type Fruit = {
     name:string,
