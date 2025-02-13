@@ -37,6 +37,6 @@ def get_current_user(request: Request) -> UserResponse:
         )
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e)
         )
