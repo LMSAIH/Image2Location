@@ -1,7 +1,7 @@
 import { FormEvent } from "react"
 import { useState } from 'react'
 import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
+
 
 export default function Signup() {
 
