@@ -108,7 +108,6 @@ async def getLocationInfo(
     
     try:
         
-            
         prompt = f"""Provide comprehensive tourist information about {city}, {province} in {country}. Return only a JSON object and nothing more nor at the beggining or end in this exact format:
         {{
             "Message": "A welcoming introduction highlighting the unique character and main appeal of the location",
