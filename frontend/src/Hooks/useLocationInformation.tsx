@@ -1,49 +1,55 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export const useLocationInfo = () => {
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stream, setStream] = useState<string>('');
-
-  
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   const getLocationInfo = async (city: string, province: string, country: string) => {
+
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+
     setLoading(true);
     setError(null);
     setStream('');
 
-    const eventSource = new EventSource(
-      `http://localhost:8000/locationInfo?city=${encodeURIComponent(city)}&province=${encodeURIComponent(province)}&country=${encodeURIComponent(country)}`,
-      { withCredentials: true }
-    );
+    const url = `http://localhost:8000/locationInfo?city=${encodeURIComponent(
+      city
+    )}&province=${encodeURIComponent(province)}&country=${encodeURIComponent(country)}`;
 
-    eventSource.onmessage = (event) => {
-      if (event.data) {
-        setStream(prev => {
-          const parsedContent = event.data;
-          return prev + parsedContent;
-        });
+    const es = new EventSource(url, { withCredentials: true });
+    eventSourceRef.current = es;
+
+    es.onmessage = (event) => {
+      setStream((prev) => prev + event.data);
+    };
+
+    es.onerror = (event) => {
+
+      if (es.readyState === 0) {
+        es.close()
+        setLoading(false);
+      } else {
+        setError('Connection error. Attempting to reconnect...');
       }
     };
 
-    eventSource.addEventListener('complete', (event) => {
-     setStream(event.data)
-      eventSource.close();
+    es.onopen = () => {
       setLoading(false);
-    });
-
-    eventSource.addEventListener('error', () => {
-      setError('Failed to fetch location information');
-      eventSource.close();
-      setLoading(false);
-    });
-
-    eventSource.onerror = () => {
-      setError('Connection error');
-      eventSource.close();
-      setLoading(false);
+      setError(null);
     };
+
+    useEffect(() => {
+      return () => {
+        if (eventSourceRef.current) {
+          eventSourceRef.current.close();
+        }
+      };
+    }, []);
+
   };
 
   return { loading, error, stream, getLocationInfo };
