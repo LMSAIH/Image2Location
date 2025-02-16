@@ -9,6 +9,8 @@ import os
 from picarta import Picarta
 import json
 from openai import AsyncOpenAI
+import asyncio
+from sse_starlette.sse import EventSourceResponse
 
 router = APIRouter()
 
@@ -97,7 +99,7 @@ async def getLocations(request: Request, user = Depends(get_current_user)):
             detail=str(e)
         )
         
-@router.get('/locationInfo', response_model=LocationInfo)
+@router.get('/locationInfo')
 async def getLocationInfo(
     request: Request,
     city: str,
@@ -105,51 +107,62 @@ async def getLocationInfo(
     country: str,
     user = Depends(get_current_user),
 ):
-    
-    try:
-        
-        prompt = f"""Provide comprehensive tourist information about {city}, {province} in {country}. Return only a JSON object and nothing more nor at the beggining or end in this exact format:
-        {{
-            "Message": "A welcoming introduction highlighting the unique character and main appeal of the location",
-            "Best_Seasons": [
-                "Spring (March-May): Detail specific events, weather conditions, and unique seasonal attractions",
-                "Summer (June-August): Detail specific events, weather conditions, and unique seasonal attractions",
-                "Fall (September-November): Detail specific events, weather conditions, and unique seasonal attractions",
-                "Winter (December-February): Detail specific events, weather conditions, and unique seasonal attractions"
-            ],
-            "Best_attractions": [
-                "Famous Landmark: Include historical significance, visitor tips, and best time to visit",
-                "Cultural Site: Include cultural importance, unique features, and visitor experience",
-                "Natural Wonder: Include natural beauty, activities available, and photography opportunities",
-                "Local Experience: Include authentic local activities, cultural immersion opportunities, and insider tips"
-            ],
-            "Good_Hotels": [
-                "Luxury Option: Include location benefits, standout amenities, and price range",
-                "Mid-Range Option: Include location benefits, value propositions, and price range",
-                "Boutique Option: Include unique features, local charm, and price range"
-            ]
-        }}
-        Ensure all responses are factual and currently valid. Focus on unique local experiences and practical visitor information."""
+    async def event_generator():
+        try:
+            prompt = f"""Provide comprehensive tourist information about {city}, {province} in {country} You must adhere to this format:
 
-        response = await client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a travel expert. Provide accurate and detailed travel information in JSON format only."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=1000
-        )
+Start with a welcoming introduction about the location.
 
-        # Extract the response text and parse it as JSON
-        response_text = response.choices[0].message.content
-        print(response_text)
-        location_info = json.loads(response_text)
-        
-        return LocationInfo(**location_info)
+**Best Seasons to Visit**
+^- Spring (March-May): Detail specific events, weather conditions, and seasonal attractions 
+^- Summer (June-August): Detail specific events, weather conditions, and seasonal attractions 
+^- Fall (September-November): Detail specific events, weather conditions, and seasonal attractions 
+^- Winter (December-February): Detail specific events, weather conditions, and seasonal attractions 
 
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+**Must-See Attractions**
+^- Famous Landmark: Include historical significance and visitor tips 
+^- Cultural Site: Include cultural importance and unique features 
+^- Natural Wonder: Include natural beauty and activities available 
+^- Local Experience: Include authentic activities and insider tips 
+
+**Recommended Hotels**
+^- Luxury Option: Include location benefits and standout amenities 
+^- Mid-Range Option: Include location benefits and value propositions 
+^- Boutique Option: Include unique features and local charm  """
+
+            response = await client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You are a travel expert. Provide accurate and detailed travel information, Adhere strictly to the format provided,special symbols and line breaks matter."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0,
+                max_tokens=1000,
+                stream=True
+            )
+
+            collected_messages = []
+            async for chunk in response:
+                if chunk.choices[0].delta.content is not None:
+                    content = chunk.choices[0].delta.content
+                    collected_messages.append(content)
+                    yield {
+                        "event": "message",
+                        "data": content
+                    }
+                    
+
+            complete_response = "".join(collected_messages)
+            
+            yield {
+                "event": "complete",
+                "data": complete_response
+            }
+
+        except Exception as e:
+            yield {
+                "event": "error",
+                "data": str(e)
+            }
+
+    return EventSourceResponse(event_generator())
