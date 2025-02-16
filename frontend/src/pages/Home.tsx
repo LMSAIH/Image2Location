@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react"
 import axios from 'axios'
 import { Maps } from "../components/Maps"
+import { LocationInformation } from "../components/LocationInformation"
 
 
 export default function Homepage() {
@@ -107,6 +108,7 @@ export default function Homepage() {
                                 <strong>Location: {location.country}, {location.province}, {location.city} </strong>
                             </p>
                             <Maps lat={location.latitude} lng={location.longitude} />
+                            <LocationInformation city={location.city} country = {location.country} province= {location.province}/> 
                         </div>
                     </section>
                 )}
