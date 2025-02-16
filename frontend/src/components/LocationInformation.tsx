@@ -15,17 +15,8 @@ export function LocationInformation({ city, province, country }: LocationInforma
       getLocationInfo(city, province, country);
     }
   }, [city, province, country]);
-
-  if (error) {
-    return (
-      <div className="text-red-500 p-4 rounded-lg bg-red-900/20">
-        {error}
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6 text-white">
+    <div className="space-y-6 text-white p-4">
       {loading && (
         <div className="space-y-6 animate-pulse">
           <div className="h-6 w-3/4 bg-gray-700 rounded"></div>
@@ -86,6 +77,9 @@ export function LocationInformation({ city, province, country }: LocationInforma
           })}
         </div>
       )}
+       {error && <div className="text-red-500 p-4 rounded-lg bg-red-900/20">
+        {error}
+      </div>}
     </div>
   );
 }
