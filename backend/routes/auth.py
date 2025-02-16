@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer
 from typing import Optional
 from models.auth import UserCreate, UserLogin, Token, UserResponse
-from database.db import supabase, supabase_admin
+from database.db import supabase, supabase_admin, supabase_jwt_secret
 import re
+import jwt
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -83,6 +84,21 @@ async def logout(response: Response):
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail=str(e)
         )
+        
+@router.get("/verify")
+async def verify(request: Request):
+    token = request.cookies.get("access_token")
+    print(token)
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    
+    try:
+       response = supabase.auth.get_user(token)
+       return response.user
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+
+    
 
 def is_strong_password(password: str) -> bool:
     """
