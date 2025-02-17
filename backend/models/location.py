@@ -13,6 +13,7 @@ class Location(BaseModel):
     province: str
     imageUrl: str
     user: str
+    id: str
 
 class Locations(BaseModel):
     locations: List[Location]
