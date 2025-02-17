@@ -54,7 +54,7 @@ export default function Homepage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center p-4">
+        <div className="min-h-screen  text-white flex flex-col items-center justify-center p-4">
             <main className="w-3/4">
                 <h1 className="text-4xl font-bold mb-6 text-center">AI Image to Location Visualizer</h1>
 
