@@ -47,6 +47,7 @@ export default function Location() {
             {location &&
                 <div className="w-3/4 m-auto mt-10 ">
                     <h1 className="text-white text-xl"> {location.city}, {location.province}, {location.country}.</h1>
+                    {error && <p>{error}</p>}
                     <Maps lat={location.latitude} lng={location.longitude} />
                     <LocationInformation city={location.city} province={location.province} country={location.country} />
                 </div>
