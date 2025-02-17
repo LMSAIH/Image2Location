@@ -59,10 +59,12 @@ async def addImage(
             }
              
             supabase.table("Locations").insert(location).execute()
+            result = supabase.table('Locations').select().eq("image_url",imageUrl).execute()
+            locationId=result.data[0]
             
             return Location(latitude=location["latitude"], longitude=location["longitude"], country=location["country"],
                             province=location["province"], city=location["city"], imageUrl=location["image_url"],
-                            user = location["user"])
+                            user = location["user"], id = str(locationId["id"]))
             
     except Exception as e:
         raise HTTPException(
