@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom";
 import axios from 'axios'
+import { BiTrash } from "react-icons/bi";
 
 interface Location {
     latitude: number;
@@ -34,6 +35,18 @@ export default function LocationsList() {
 
     }, []);
 
+    const handleDelete = async (id:string) => {
+
+        try{
+           
+            setLocations((locations?.filter((location) => location.id !== id) || null));
+            const response = await axios.delete(`http://localhost:8000/location/${id}`,{withCredentials:true})
+            
+        } catch(err){
+            console.log(err)
+        }
+    }
+
     const indexOfLastLocation = currentPage * locationsPerPage;
     const indexOfFirstLocation = indexOfLastLocation - locationsPerPage;
     const currentLocations = locations ? locations.slice(indexOfFirstLocation, indexOfLastLocation) : [];
@@ -51,7 +64,7 @@ export default function LocationsList() {
 
                         <div
                             key={location.city + index}
-                            className="bg-[#111111] border border-[#222222] rounded-xl overflow-hidden shadow-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer hover:scale-105 duration-300"
+                            className="bg-[#111111] border border-[#222222] rounded-xl overflow-hidden shadow-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer hover:scale-105 duration-300 relative"
                         >
                             <Link className="w-full h-full" to={`/location/${location.id}`}>
                                 <div className="relative h-48">
@@ -71,6 +84,7 @@ export default function LocationsList() {
                                     </p>
                                 </div>
                             </Link>
+                            <BiTrash className="absolute right-5 bottom-5 z-10 size-6 hover:text-red-500" onClick={()=>{handleDelete(location.id)}}/>
                         </div>
 
                     ))}
