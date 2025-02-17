@@ -46,12 +46,6 @@ async def addImage(
      
      if response.path:
             imageUrl = f"{supabase_url}/storage/v1/object/public/{supabase_bucket}/{image_filename}"
-            imagesObj = {
-             "image_url": imageUrl,
-             "user": user.id
-            }
-            
-            supabase.table("Images").insert(imagesObj).execute()
             localizatorResponse = localizer.localize(img_path=imageUrl,top_k=1)
             
             location = {
@@ -88,7 +82,7 @@ async def getLocations(request: Request, user = Depends(get_current_user)):
         for location in user_locations.data:
             locations.append(Location(latitude=location["latitude"], longitude=location["longitude"], country=location["country"],
                                       province=location["province"], city = location['city'], imageUrl=location["image_url"],
-                                      user=location['user']))
+                                      user=location['user'], id=str(location['id'])))
         
         return Locations(locations=locations)
     
@@ -166,3 +160,51 @@ Start with a welcoming introduction about the location.
             }
 
     return EventSourceResponse(event_generator())
+
+@router.get('/location/{id}', response_model=Location)
+async def getLocationById(id: str, user = Depends(get_current_user)):
+    try:
+        result = supabase.table("Locations").select().eq("id", id).eq("user", user.id).execute()
+        if not result.data or len(result.data) == 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Location not found")
+        
+        loc = result.data[0]
+        return Location(
+            latitude=loc["latitude"],
+            longitude=loc["longitude"],
+            country=loc["country"],
+            province=loc["province"],
+            city=loc["city"],
+            imageUrl=loc["image_url"],
+            user=loc["user"],
+            id=str(loc["id"])
+        )
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    
+@router.delete('/location/{id}', response_model=Location)
+async def deleteLocation(id:str, user= Depends(get_current_user)):
+    try:
+        result = supabase.table("Locations").delete().eq("id",id).eq("user", user.id).execute()
+        if not result.data or len(result.data) == 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Location not found")
+        loc = result.data[0]
+        
+        image_url = loc.get("image_url")
+        if image_url:
+            filename = image_url.split("/")[-1]
+            supabase_admin.storage.from_(supabase_bucket).remove([filename])
+        
+        return Location(
+            latitude=loc["latitude"],
+            longitude=loc["longitude"],
+            country=loc["country"],
+            province=loc["province"],
+            city=loc["city"],
+            imageUrl=loc["image_url"],
+            user=loc["user"],
+            id=str(loc["id"])
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
