@@ -88,7 +88,7 @@ async def logout(response: Response):
 @router.get("/verify")
 async def verify(request: Request):
     token = request.cookies.get("access_token")
-    print(token)
+ 
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     
