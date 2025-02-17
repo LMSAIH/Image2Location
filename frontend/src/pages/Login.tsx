@@ -21,8 +21,6 @@ export default function Login() {
                 withCredentials: true
             });
 
-            console.log(response.data)
-
             await refreshAuth();
             setError(null);
             window.location.href = "/";
