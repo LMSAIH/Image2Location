@@ -24,7 +24,7 @@ export default function LocationsList() {
         const getLocations = async () => {
             try {
                 const response = await axios.get('http://localhost:8000/locations', { withCredentials: true });
-                setLocations(response.data.locations);
+                setLocations(response.data.locations.reverse());
 
             } catch (err) {
                 console.log(err);
@@ -53,9 +53,9 @@ export default function LocationsList() {
     const totalPages = locations ? Math.ceil(locations.length / locationsPerPage) : 0;
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white p-8">
+        <div className="min-h-screen text-white p-8">
             <header className="mb-12">
-                <h1 className="text-4xl font-bold text-center">Your Locations</h1>
+            <h1 className="text-4xl font-bold mb-6 text-center bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Your Locations:</h1>
             </header>
 
             {locations ? (
@@ -98,7 +98,7 @@ export default function LocationsList() {
                     <button
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 bg-[#2dd4bf] text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 bg-cyan-400 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Previous
                     </button>
@@ -108,7 +108,7 @@ export default function LocationsList() {
                     <button
                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        className="px-4 py-2 bg-[#2dd4bf] text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 bg-cyan-400 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Next
                     </button>
