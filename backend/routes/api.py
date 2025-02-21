@@ -7,9 +7,7 @@ import uuid
 from dotenv import load_dotenv
 import os
 from picarta import Picarta
-import json
 from openai import AsyncOpenAI
-import asyncio
 from sse_starlette.sse import EventSourceResponse
 
 router = APIRouter()
