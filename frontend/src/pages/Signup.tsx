@@ -32,12 +32,12 @@ export default function Signup() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-4">
             <div className="w-full max-w-md bg-[#111111] border border-[#222222] rounded-xl shadow-2xl">
                 <div className="p-8">
                     <div className="space-y-2 mb-6">
-                        <h1 className="text-2xl font-bold tracking-tight text-white">Create an account</h1>
-                        <p className="text-sm text-gray-400">Get started with AI Image Visualizer</p>
+                        <h1 className="text-2xl font-bold tracking-tight text-cyan-400">Create an account</h1>
+                        <p className="text-sm text-gray-400">Get started with Location Finder AI</p>
                     </div>
 
                     <form className="space-y-4" onSubmit={handleClick}>
@@ -74,7 +74,7 @@ export default function Signup() {
 
                         <button
                             type="submit"
-                            className="w-full py-2 px-4 bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-medium rounded-lg transition-colors duration-200 ease-in-out"
+                            className="w-full py-2 px-4 bg-cyan-400 hover:bg-[#14b8a6] text-black font-medium rounded-lg transition-colors duration-200 ease-in-out"
                         >
                             Create Account
                         </button>
@@ -116,7 +116,7 @@ export default function Signup() {
 
                     <p className="mt-6 text-center text-sm text-gray-400">
                         Already have an account?{" "}
-                        <a href="/login" className="text-[#2dd4bf] hover:underline">
+                        <a href="/login" className="text-cyan-400 hover:underline">
                             Sign in
                         </a>
                     </p>
