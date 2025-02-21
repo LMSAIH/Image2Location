@@ -56,12 +56,12 @@ export default function Homepage() {
     return (
         <div className="min-h-screen  text-white flex flex-col items-center justify-center p-4">
             <main className="w-3/4">
-                <h1 className="text-4xl font-bold mb-6 text-center">AI Image to Location Visualizer</h1>
+                <h1 className="text-4xl font-bold mb-6 text-center bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Location Finder AI</h1>
 
                 <section className="mb-12 text-center">
-                    <p className="text-lg mb-4">Upload an image and discover details about the location it depicts.</p>
+                    <p className="text-lg mb-4">Upload an image and discover your next adventure</p>
                     <p className="text-gray-400">
-                        Our AI analyzes your image to provide information about the place, landmarks, and more.
+                        Our AI analyzes your image to provide information about the place, landmarks, hotels and much more.
                     </p>
                 </section>
 
@@ -92,7 +92,7 @@ export default function Homepage() {
                         <button
                             type="submit"
                             disabled={!selectedFile || isLoading}
-                            className="w-full py-2 px-4 bg-[#2dd4bf] hover:bg-[#14b8a6] text-black font-medium rounded-lg transition-colors duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full py-3 px-4 bg-cyan-400 hover:bg-[#14b8a6] text-black font-medium rounded-lg transition-colors duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isLoading ? "Processing..." : "Analyze Image"}
                         </button>
