@@ -4,7 +4,6 @@ from typing import Optional
 from models.auth import UserCreate, UserLogin, Token, UserResponse
 from database.db import supabase, supabase_admin, supabase_jwt_secret
 import re
-import jwt
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
