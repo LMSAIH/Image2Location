@@ -7,3 +7,4 @@ class LocationInfo(BaseModel):
     Best_attractions: List[str]
     Good_Hotels: List[str]
     
+    
