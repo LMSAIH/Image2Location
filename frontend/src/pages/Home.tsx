@@ -48,6 +48,7 @@ export default function Homepage() {
             setError(error.response.data.detail)
 
         } finally {
+            
             setIsLoading(false)
 
         }
