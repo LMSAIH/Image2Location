@@ -26,6 +26,7 @@ export default function Login() {
             window.location.href = "/";
 
         } catch (err: any) {
+            console.log(err)
             setError(err.response?.data?.detail || "An error occurred");
         }
     };
