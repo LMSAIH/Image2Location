@@ -41,7 +41,6 @@ export default function Homepage() {
 
             setLocation(response.data)
             setError(null)
-            console.log(response.data)
 
         } catch (error: any) {
             console.error("Error processing image:", error)
