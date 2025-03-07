@@ -17,6 +17,8 @@ const AuthContext = createContext<AuthContextType>({
   refreshAuth: async () => {}
 });
 
+
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<object | null>(null);
